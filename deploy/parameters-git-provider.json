@@ -1,0 +1,46 @@
+[
+  {
+    "ParameterKey": "VpcId",
+    "ParameterValue": "vpc-xxxxxxxx"
+  },
+  {
+    "ParameterKey": "Subnet1",
+    "ParameterValue": "subnet-aaaaaaa"
+  },
+  {
+    "ParameterKey": "Subnet2",
+    "ParameterValue": "subnet-bbbbbbb"
+  },
+  {
+    "ParameterKey": "ImageUri",
+    "ParameterValue": "238338230919.dkr.ecr.us-east-1.amazonaws.com/git-provider:latest"
+  },
+  {
+    "ParameterKey": "ClusterName",
+    "ParameterValue": "pr-notifications-cluster"
+  },
+  {
+    "ParameterKey": "LoadBalancerArn",
+    "ParameterValue": "arn:aws:elasticloadbalancing:us-east-1:xxxxxxxx:loadbalancer/app/..."
+  },
+  {
+    "ParameterKey": "GitProviderTargetGroupArn",
+    "ParameterValue": "arn:aws:elasticloadbalancing:us-east-1:xxxxxxxx:targetgroup/git-provider-tg/..."
+  },
+  {
+    "ParameterKey": "TaskExecutionRoleArn",
+    "ParameterValue": "arn:aws:iam::238338230919:role/pr-notifications-stack-PrNotificationsTaskExecution-Y4N0OFTDCcoP"
+  },
+  {
+    "ParameterKey": "TaskRoleArn",
+    "ParameterValue": "arn:aws:iam::238338230919:role/pr-git-api-task-role"
+  },
+  {
+    "ParameterKey": "SecurityGroupId",
+    "ParameterValue": "sg-xxxxxxxx"
+  },
+  {
+    "ParameterKey": "ListenerArn",
+    "ParameterValue": "arn:aws:elasticloadbalancing:us-east-1:xxxxxxxx:listener/app/.../..."
+  }
+]

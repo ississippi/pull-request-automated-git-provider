@@ -1,0 +1,85 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: GitHub PR automation FastAPI service on ECS Fargate (modular add-on)
+
+Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+  Subnet1:
+    Type: AWS::EC2::Subnet::Id
+  Subnet2:
+    Type: AWS::EC2::Subnet::Id
+  ImageUri:
+    Type: String
+    Description: ECR image URI for the git provider service
+  ClusterName:
+    Type: String
+  LoadBalancerArn:
+    Type: String
+  GitProviderTargetGroupArn:
+    Type: String
+  TaskExecutionRoleArn:
+    Type: String
+  TaskRoleArn:
+    Type: String
+  SecurityGroupId:
+    Type: AWS::EC2::SecurityGroup::Id
+  ListenerArn:
+    Type: String
+
+Resources:
+
+  GitProviderTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: git-provider-task
+      Cpu: 512
+      Memory: 1024
+      NetworkMode: awsvpc
+      RequiresCompatibilities: [FARGATE]
+      ExecutionRoleArn: !Ref TaskExecutionRoleArn
+      TaskRoleArn: !Ref TaskRoleArn
+      ContainerDefinitions:
+        - Name: git-provider-api
+          Image: !Ref ImageUri
+          PortMappings:
+            - ContainerPort: 8040
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: /ecs/git-provider-api
+              awslogs-region: us-east-1
+              awslogs-stream-prefix: ecs
+
+  GitProviderService:
+    Type: AWS::ECS::Service
+    DependsOn: GitProviderListenerRule
+    Properties:
+      Cluster: !Ref ClusterName
+      LaunchType: FARGATE
+      DesiredCount: 1
+      TaskDefinition: !Ref GitProviderTaskDefinition
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          AssignPublicIp: ENABLED
+          SecurityGroups:
+            - !Ref SecurityGroupId
+          Subnets:
+            - !Ref Subnet1
+            - !Ref Subnet2
+      LoadBalancers:
+        - ContainerName: git-provider-api
+          ContainerPort: 8040
+          TargetGroupArn: !Ref GitProviderTargetGroupArn
+
+  GitProviderListenerRule:
+    Type: AWS::ElasticLoadBalancingV2::ListenerRule
+    Properties:
+      ListenerArn: !Ref ListenerArn
+      Priority: 40
+      Conditions:
+        - Field: path-pattern
+          Values:
+            - /git/*
+      Actions:
+        - Type: forward
+          TargetGroupArn: !Ref GitProviderTargetGroupArn
